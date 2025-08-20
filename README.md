@@ -1,444 +1,185 @@
-💬 API REST del Foro (Challenge Alura)
+# 💬 API REST del Foro (Challenge Alura)
 
-Este proyecto implementa una API REST para un foro, desarrollada como parte del Challenge de Alura ONE. Permite a los usuarios registrarse, autenticarse, crear tópicos de discusión, listar tópicos, detallar un tópico por ID, actualizar tópicos y eliminar tópicos. Incorpora seguridad basada en JWT (JSON Web Tokens) para proteger los endpoints.
+Este proyecto implementa una  **API REST para un foro** , desarrollada como parte del  *Challenge de Alura ONE* .
 
+Permite a los usuarios registrarse, autenticarse, crear y gestionar tópicos de discusión.
 
+La seguridad está implementada con **JWT (JSON Web Tokens)** para proteger los endpoints.
 
-🌟 Características
+---
 
-Autenticación de Usuarios: Registro básico y autenticación mediante email y contraseña, generando un JWT.
+## 🌟 Características
 
+* 🔑  **Autenticación de Usuarios** : Registro y login con email/contraseña → genera JWT.
+* 📝  **Gestión de Tópicos** :
+  * Crear nuevos tópicos (requiere autenticación).
+  * Listar todos los tópicos (público).
+  * Ver detalle de un tópico por ID (requiere autenticación).
+  * Actualizar y eliminar tópicos (requiere autenticación).
+* 🛡️  **Seguridad** : Spring Security con JWT.
+* 🗄️  **Base de Datos** : PostgreSQL con Spring Data JPA.
+* ✅ **Validación de Datos** con `jakarta.validation`.
 
+---
 
-Gestión de Tópicos:
+## 🛠️ Tecnologías Utilizadas
 
+* ☕ Java 17
+* 🚀 Spring Boot 3.x (Web, Data JPA, Security, Validation, DevTools)
+* 🗄️ PostgreSQL
+* 📦 Maven
+* 📝 Lombok
+* 🔐 Auth0 java-jwt
 
+---
 
-Creación de nuevos tópicos (requiere autenticación).
+## 🚀 Cómo Empezar
 
+### 📌 Requisitos Previos
 
+* JDK 17+
+* Maven
+* PostgreSQL (5432 por defecto)
+* PgAdmin 4 (opcional)
+* IDE (IntelliJ IDEA recomendado)
+* Postman / Insomnia
 
-Listado de todos los tópicos (acceso público).
+---
 
+### 1️⃣ Configuración de la Base de Datos
 
+<pre class="overflow-visible!" data-start="1598" data-end="1792"><div class="contain-inline-size rounded-2xl relative bg-token-sidebar-surface-primary"><div class="sticky top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><span class="" data-state="closed"></span></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre! language-properties"><span>spring.datasource.url=jdbc:postgresql://localhost:5432/foro_db
+spring.datasource.username=postgres
+spring.datasource.password=YOUR_PASSWORD
 
-Detalle de un tópico por ID (requiere autenticación).
+api.security.secret=YOUR_JWT_SECRET
+</span></code></div></div></pre>
 
+### 2️⃣ Insertar un Usuario Inicial
 
+En la tabla `users` de la DB:
 
-Actualización de tópicos por ID (requiere autenticación).
+<pre class="overflow-visible!" data-start="1860" data-end="1944"><div class="contain-inline-size rounded-2xl relative bg-token-sidebar-surface-primary"><div class="sticky top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><span class="" data-state="closed"></span></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre! language-sql"><span><span>email: test</span><span>@example</span><span>.com
+password: </span><span><</span><span>hash_bcrypt_de_tu_password</span><span>></span><span>
+role: </span><span>USER</span><span>
+</span></span></code></div></div></pre>
 
+### 3️⃣ Ejecutar la Aplicación
 
+En IntelliJ → `ForumApplication.java` →  **Run** .
 
-Eliminación de tópicos por ID (requiere autenticación).
+Se levanta en `http://localhost:8080`.
 
+---
 
+## 🗺️ Endpoints de la API
 
-Seguridad: Implementación de Spring Security con JWT para proteger los recursos de la API.
+### 🔐 1. Autenticación
 
+**POST** `http://localhost:8080/auth`
 
+Body:
 
-Base de Datos: Persistencia de datos con PostgreSQL y Spring Data JPA.
+<pre class="overflow-visible!" data-start="2171" data-end="2240"><div class="contain-inline-size rounded-2xl relative bg-token-sidebar-surface-primary"><div class="sticky top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><span class="" data-state="closed"></span></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre! language-json"><span><span>{</span><span>
+  </span><span>"email"</span><span>:</span><span></span><span>"test@example.com"</span><span>,</span><span>
+  </span><span>"password"</span><span>:</span><span></span><span>"123456"</span><span>
+</span><span>}</span><span>
+</span></span></code></div></div></pre>
 
+✅ Devuelve `jwtToken`.
 
+📸 *Postman mostrando login y token devuelto*
 
-Validación de Datos: Uso de jakarta.validation para validar los DTOs de entrada.
+![Login exitoso en Postman](assets/Autorización-del-tópico.png)
 
+---
 
+### 🌍 2. Listar Tópicos
 
-🛠️ Tecnologías Utilizadas
+**GET** `http://localhost:8080/topics`
 
-Java 17: Lenguaje de programación.
+✅ Devuelve lista JSON.
 
+📸 *Respuesta con lista de tópicos en Postman*
 
+![Lista de tópicos en Postman](assets/Mostrar-todos-los-tópicos.png)
 
-Spring Boot 3.x: Framework para el desarrollo rápido de APIs REST.
+---
 
+### ➕ 3. Crear Tópico
 
+**POST** `http://localhost:8080/topics`
 
-spring-boot-starter-web: Para construir APIs web.
+Headers: `Authorization: Bearer <JWT>`
 
+Body:
 
+<pre class="overflow-visible!" data-start="2613" data-end="2775"><div class="contain-inline-size rounded-2xl relative bg-token-sidebar-surface-primary"><div class="sticky top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><span class="" data-state="closed"></span></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre! language-json"><span><span>{</span><span>
+  </span><span>"title"</span><span>:</span><span></span><span>"Duda sobre Spring Security"</span><span>,</span><span>
+  </span><span>"message"</span><span>:</span><span></span><span>"¿Cómo se gestionan los roles con JWT?"</span><span>,</span><span>
+  </span><span>"courseName"</span><span>:</span><span></span><span>"Desarrollo Backend"</span><span>,</span><span>
+  </span><span>"userId"</span><span>:</span><span></span><span>1</span><span>
+</span><span>}</span><span>
+</span></span></code></div></div></pre>
 
-spring-boot-starter-data-jpa: Para interactuar con la base de datos de forma sencilla.
+📸 *Postman mostrando creación de tópico*
 
+![Creación y detalle de tópico en Postman](assets/Registro-de-un-nuevo-tópico-y-detallado.png)
 
+---
 
-spring-boot-starter-security: Para la seguridad de la aplicación.
+### 📌 4. Detalle de Tópico
 
+**GET** `http://localhost:8080/topics/{id}`
 
+Headers: `Authorization: Bearer <JWT>`
 
-spring-boot-starter-validation: Para validar los datos de entrada.
+📸 *Postman mostrando detalle de un tópico*
 
+![Creación y detalle de tópico en Postman](assets/Registro-de-un-nuevo-tópico-y-detallado.png)
 
 
-spring-boot-devtools: Herramientas de desarrollo que facilitan los reinicios.
+---
 
+### ✏️ 5. Actualizar Tópico
 
+**PUT** `http://localhost:8080/topics/{id}`
 
-PostgreSQL: Sistema de gestión de bases de datos relacionales.
+📸 *Postman mostrando actualización exitosa*
 
+![Actualización de tópico en Postman](assets/Tópico-actualizado.png)
 
+![Vista de tópicos actualizados en Postman](assets/Tópicos-actualizados.png)
 
-Maven: Herramienta de gestión de dependencias y construcción del proyecto.
+---
 
+### 🗑️ 6. Eliminar Tópico
 
+**DELETE** `http://localhost:8080/topics/{id}`
 
-Lombok: Librería para reducir el código repetitivo (boilerplate) mediante anotaciones (ej. @Getter, @NoArgsConstructor).
+📸 *Postman mostrando respuesta 204 No Content*
 
+![Eliminación de tópico en Postman](assets/Eliminación-del-tópico.png)
 
+---
 
-java-jwt (Auth0): Librería para la implementación de JSON Web Tokens.
+## 💡 Posibles Mejoras
 
+* Estado de tópicos (`OPEN` / `CLOSED`).
+* Respuestas personalizadas para errores (ej. 404).
+* Registro de usuarios desde la API.
+* Añadir modelo de **Respuestas** a los tópicos.
 
+---
 
-🚀 Cómo Empezar
+## 🤝 Contribuciones
 
-Sigue estos pasos para levantar y probar la API en tu entorno local.
+¡Bienvenidas las ideas y mejoras! 🎉
 
+Abre un **issue** o un  **pull request** .
 
+---
 
-Requisitos Previos
+## 📄 Licencia
 
-Asegúrate de tener instalado lo siguiente:
-
-
-
-JDK 17 o superior.
-
-
-
-Maven (generalmente incluido con los IDEs modernos como IntelliJ IDEA).
-
-
-
-PostgreSQL instalado y ejecutándose localmente (puerto por defecto 5432).
-
-
-
-PgAdmin 4 (o cualquier cliente PostgreSQL) para gestionar la base de datos.
-
-
-
-IntelliJ IDEA (o tu IDE de preferencia).
-
-
-
-Postman (o Insomnia) para probar los endpoints de la API.
-
-
-
-1\. Configuración de la Base de Datos
-
-Crea la base de datos:
-
-
-
-Abre PgAdmin 4 y conéctate a tu servidor PostgreSQL.
-
-
-
-Crea una nueva base de datos llamada foro\_db. Asegúrate de que el propietario sea postgres (o tu usuario principal).
-
-
-
-Configura las credenciales en application.properties:
-
-
-
-Abre src/main/resources/application.properties.
-
-
-
-Actualiza spring.datasource.username y spring.datasource.password con tus credenciales de PostgreSQL. El usuario más común es postgres.
-
-
-
-spring.datasource.url=jdbc:postgresql://localhost:5432/foro\_db
-
-spring.datasource.username=YOUR\_DB\_USERNAME\_HERE # Tu usuario de PostgreSQL
-
-spring.datasource.password=YOUR\_DB\_PASSWORD\_HERE # Tu contraseña real de PostgreSQL
-
-
-
-Configura la clave secreta JWT:
-
-
-
-En el mismo application.properties, define una clave secreta fuerte y única para JWT.
-
-
-
-api.security.secret=YOUR\_JWT\_SECRET\_HERE # Una clave secreta muy larga y segura para JWT
-
-
-
-2\. Configuración del Proyecto en IntelliJ IDEA
-
-Clona o descarga el proyecto y ábrelo en IntelliJ IDEA.
-
-
-
-Recarga las dependencias de Maven: Asegúrate de que IntelliJ descargue todas las dependencias definidas en pom.xml. Busca el icono de Maven para "Reload All Maven Projects".
-
-
-
-Limpia y reconstruye el proyecto:
-
-
-
-Build -> Clean Project
-
-
-
-Build -> Rebuild Project
-
-
-
-3\. Insertar un Usuario Inicial en la Base de Datos
-
-Para poder autenticarte y probar la API, necesitas un usuario en la base de datos.
-
-
-
-En PgAdmin 4, navega a Databases -> foro\_db -> Schemas -> public -> Tables.
-
-
-
-Haz clic derecho en la tabla users y selecciona "View/Edit Data" -> "All Rows".
-
-
-
-Añade una nueva fila:
-
-
-
-id: Déjalo en \[default] (se generará automáticamente).
-
-
-
-email: test@example.com (o cualquier email para tu usuario de prueba).
-
-
-
-password: Pega el hash BCrypt de tu contraseña (ej., si tu contraseña es 123456, usa el hash generado por BCryptPasswordEncoder).
-
-
-
-role: USER (¡en mayúsculas!).
-
-
-
-Haz clic en el icono del disquete (Save Data Changes) para guardar la fila.
-
-
-
-4\. Ejecutar la Aplicación
-
-En IntelliJ IDEA, abre la clase ForumApplication.java.
-
-
-
-Haz clic derecho en el método main y selecciona "Run 'ForumApplication.main()'".
-
-
-
-La aplicación se iniciará en el puerto 8080 por defecto.
-
-
-
-🗺️ Endpoints de la API
-
-Utiliza Postman (o Insomnia) para probar los siguientes endpoints:
-
-
-
-1\. Autenticación (Obtener JWT)
-
-URL: POST http://localhost:8080/auth
-
-
-
-Headers:
-
-
-
-Content-Type: application/json
-
-
-
-Body (raw / JSON):
-
-
-
-{
-
-&nbsp;   "email": "test@example.com",
-
-&nbsp;   "password": "123456"
-
-}
-
-
-
-Respuesta Exitosa: 200 OK con un JSON que contiene el jwtToken. Copia este token.
-
-
-
-2\. Listar Tópicos (Público)
-
-URL: GET http://localhost:8080/topics
-
-
-
-Headers: (Ninguno específico)
-
-
-
-Respuesta Exitosa: 200 OK con una lista JSON de tópicos.
-
-
-
-3\. Crear Tópico (Protegido - Requiere Autenticación)
-
-URL: POST http://localhost:8080/topics
-
-
-
-Headers:
-
-
-
-Content-Type: application/json
-
-
-
-Authorization: Bearer TU\_TOKEN\_JWT\_AQUI (Reemplaza con el token obtenido en el paso 1 de Autenticación).
-
-
-
-Body (raw / JSON):
-
-
-
-{
-
-&nbsp;   "title": "Duda sobre Spring Security",
-
-&nbsp;   "message": "¿Cómo se gestionan los roles con JWT?",
-
-&nbsp;   "courseName": "Desarrollo Backend",
-
-&nbsp;   "userId": 1 // ID del usuario que creaste en la DB
-
-}
-
-
-
-Respuesta Exitosa: 201 Created con el JSON del tópico creado.
-
-
-
-4\. Detallar Tópico por ID (Protegido - Requiere Autenticación)
-
-URL: GET http://localhost:8080/topics/{id} (ej. http://localhost:8080/topics/1)
-
-
-
-Headers:
-
-
-
-Authorization: Bearer TU\_TOKEN\_JWT\_AQUI
-
-
-
-Respuesta Exitosa: 200 OK con el JSON detallado del tópico.
-
-
-
-5\. Actualizar Tópico (Protegido - Requiere Autenticación)
-
-URL: PUT http://localhost:8080/topics/{id} (ej. http://localhost:8080/topics/2)
-
-
-
-Headers:
-
-
-
-Content-Type: application/json
-
-
-
-Authorization: Bearer TU\_TOKEN\_JWT\_AQUI
-
-
-
-Body (raw / JSON):
-
-
-
-{
-
-&nbsp;   "title": "Nuevo Título Actualizado",
-
-&nbsp;   "message": "Este es el mensaje actualizado del tópico. ¡Funciona!",
-
-&nbsp;   "courseName": "Actualizaciones de API"
-
-}
-
-
-
-Respuesta Exitosa: 200 OK con el JSON del tópico actualizado.
-
-
-
-6\. Eliminar Tópico (Protegido - Requiere Autenticación)
-
-URL: DELETE http://localhost:8080/topics/{id} (ej. http://localhost:8080/topics/4)
-
-
-
-Headers:
-
-
-
-Authorization: Bearer TU\_TOKEN\_JWT\_AQUI
-
-
-
-Respuesta Exitosa: 204 No Content
-
-
-
-💡 Posibles Mejoras
-
-Implementar funcionalidad para cerrar tópicos (status: "CLOSED").
-
-
-
-Añadir manejo de respuestas para tópicos no encontrados (personalizar 404).
-
-
-
-Expandir la gestión de usuarios (registro de nuevos usuarios desde la API).
-
-
-
-Añadir más modelos (ej. Respuestas a tópicos).
-
-
-
-🤝 Contribuciones
-
-¡Las contribuciones son bienvenidas! Si tienes ideas para mejorar este foro, no dudes en abrir un "issue" o enviar un "pull request".
-
-
-
-📄 Licencia
-
-Este proyecto está bajo la Licencia MIT.
-
+Proyecto bajo  **Licencia MIT** .
