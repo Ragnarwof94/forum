@@ -2,6 +2,7 @@ package com.foro.forum.controller;
 
 import com.foro.forum.dto.TopicCreationDTO; // DTO para crear tópicos
 import com.foro.forum.dto.TopicResponseDTO; // DTO para responder con tópicos
+import com.foro.forum.dto.TopicUpdateDTO; // DTO para actualizar tópicos
 import com.foro.forum.model.Topic; // Entidad Topic
 import com.foro.forum.model.User; // Entidad User
 import com.foro.forum.repository.TopicRepository; // Repositorio de tópicos
@@ -36,6 +37,14 @@ public class TopicController {
         return ResponseEntity.ok(topics); // Devuelve la lista con status 200 OK
     }
 
+    @GetMapping("/{id}") // Maneja peticiones GET a /topics/{id} (detallar un tópico por ID)
+    public ResponseEntity<TopicResponseDTO> getTopicById(@PathVariable Long id) {
+        return topicRepository.findById(id)
+                .map(TopicResponseDTO::new) // Convierte a DTO si se encuentra
+                .map(ResponseEntity::ok) // Si se encuentra, devuelve 200 OK con el DTO
+                .orElse(ResponseEntity.notFound().build()); // Si no se encuentra, devuelve 404 Not Found
+    }
+
     @PostMapping // Maneja peticiones POST a /topics (crear un nuevo tópico)
     @Transactional // Marca el método como transaccional (rollback en caso de error)
     public ResponseEntity<TopicResponseDTO> createTopic(@RequestBody @Valid TopicCreationDTO topicCreationDTO,
@@ -56,6 +65,26 @@ public class TopicController {
         return ResponseEntity.created(url).body(new TopicResponseDTO(topic)); // Devuelve 201 Created con el DTO del tópico
     }
 
+    @PutMapping("/{id}") // NUEVO MÉTODO: Maneja peticiones PUT a /topics/{id} (actualizar un tópico)
+    @Transactional
+    public ResponseEntity<TopicResponseDTO> updateTopic(@PathVariable Long id, @RequestBody @Valid TopicUpdateDTO topicUpdateDTO) {
+        // Busca el tópico por su ID
+        Optional<Topic> optionalTopic = topicRepository.findById(id);
+        if (optionalTopic.isEmpty()) {
+            return ResponseEntity.notFound().build(); // Si no existe, devuelve 404 Not Found
+        }
+
+        Topic topic = optionalTopic.get();
+
+        // Actualiza los campos del tópico si se proporcionan en el DTO de actualización
+        // (La lógica de actualización está en el modelo Topic)
+        topic.updateTopic(topicUpdateDTO.title(), topicUpdateDTO.message(), topicUpdateDTO.courseName());
+
+        topicRepository.save(topic); // Guarda los cambios en la base de datos
+        return ResponseEntity.ok(new TopicResponseDTO(topic)); // Devuelve 200 OK con el tópico actualizado
+    }
+
+
     @DeleteMapping("/{id}") // Maneja peticiones DELETE a /topics/{id} (eliminar un tópico por ID)
     @Transactional // Marca el método como transaccional
     public ResponseEntity deleteTopic(@PathVariable Long id) {
@@ -66,16 +95,4 @@ public class TopicController {
         topicRepository.deleteById(id); // Elimina el tópico
         return ResponseEntity.noContent().build(); // Devuelve 204 No Content para indicar eliminación exitosa
     }
-
-    // Puedes añadir otros métodos como PUT para actualizar, o GET por ID si los necesitas.
-    // Ejemplo de GET por ID:
-    /*
-    @GetMapping("/{id}")
-    public ResponseEntity<TopicResponseDTO> getTopicById(@PathVariable Long id) {
-        return topicRepository.findById(id)
-                .map(TopicResponseDTO::new) // Convierte a DTO si se encuentra
-                .map(ResponseEntity::ok) // Si se encuentra, devuelve 200 OK con el DTO
-                .orElse(ResponseEntity.notFound().build()); // Si no se encuentra, devuelve 404 Not Found
-    }
-    */
 }

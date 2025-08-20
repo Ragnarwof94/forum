@@ -5,12 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Table(name = "topics") // Mapea a la tabla 'topics' en la base de datos
 @Entity(name = "Topic") // Nombre de la entidad JPA
 @Getter // Lombok: genera getters automáticamente
+@Setter // Lombok: genera setters automáticamente
 @NoArgsConstructor // Lombok: genera constructor sin argumentos
 @AllArgsConstructor // Lombok: genera constructor con todos los argumentos
 @EqualsAndHashCode(of = "id") // Lombok: genera equals y hashCode basado en el ID
